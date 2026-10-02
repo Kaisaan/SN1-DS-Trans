@@ -1,0 +1,3 @@
+*.nds
+__pycache__
+*.pyc
