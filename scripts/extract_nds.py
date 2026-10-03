@@ -18,8 +18,7 @@ from libsummon.text import extract_text
 
 def main():
 
-    extract_text()
-    exit()
+
     if os.path.exists("extracted"):
         shutil.rmtree("extracted")
     print("Extracting NDS...")
@@ -28,7 +27,7 @@ def main():
         sys.stderr.write(f"Source NDS not found: {source_nds}\n")
         sys.exit(1)
     result = subprocess.run(
-        ["NitroPacker", "unpack", "-r", source_nds, "-o", "extracted", "-p", "sn1"],
+        ["NitroPacker", "unpack", "-r", source_nds, "-o", "extracted", "-p", "sn1", "-d"],
         capture_output=True,
         text=True,
         shell=False,
@@ -53,6 +52,7 @@ def main():
 
     print("Extracting all scene files...")
     extract_scenes()
+    extract_text()
     print("Done!")
 
 

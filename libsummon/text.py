@@ -3,16 +3,17 @@ def extract_text():     # scene: Path, offset: int
     scene = Path(f"decompressed/scn000a.rts")
     offset = 14384
     scene_data = scene.read_bytes()
+    data_size = len(scene_data)
 
     log = open("log.txt", "w", encoding="utf-8")
 
-    num1 = 0
-    array1 = []
-    array2 = []
-    array3 = []
+    string_count = 0
+    data_blocks = []
+    string_list = []
+    string_indices = []
     pos = offset
 
-    while (pos < len(scene_data)):
+    while (pos < data_size):
         current = pos
         flag = False
         str_len = -1
@@ -20,16 +21,16 @@ def extract_text():     # scene: Path, offset: int
 
         match byte:
 
-            case 46:
+            case 0x2E:
                 pos += 5
 
-            case 49:
+            case 0x31:
                 pos += 9
                 
-            case 52:
+            case 0x34:
                 pos += 13
                 
-            case 56:
+            case 0x38:
                 pos += 13
                 
             case 64:
@@ -104,7 +105,6 @@ def extract_text():     # scene: Path, offset: int
             case 101:
                 pos += 5
                 
-
             case 104:
                 pos += 14
                 
@@ -136,28 +136,26 @@ def extract_text():     # scene: Path, offset: int
                 else:
                     pos += 20
                 
-            case 111:
-                pos = len(scene_data)
+            case 0x6F:
+                pos = data_size
                 
-
-            case 51:
+            case 0x33:
                 flag = True
                 str_len = scene_data[pos + 5]
                 string = scene_data[pos + 6: pos + 6 + str_len].decode(encoding="shiftjis", errors="backslashreplace")
                 string = string.replace("\n", "\\n")
-                array2.append(string)
+                string_list.append(string)
                 log.write(f"{string}\n")
-                array3.append(num1)
+                string_indices.append(string_count)
                 pos += 5
                 
             case _:
-                print("bruh")
+                print(f"Undocumented control code {byte:X} at 0x{pos:X}")
 
         num4 = pos - current
         data_file = scene_data[current:num4]
-        array1.append(data_file)
+        data_blocks.append(data_file)
         if flag:
             pos = pos + 1 + str_len
 
-        num1 += 1
-        
+        string_count += 1
