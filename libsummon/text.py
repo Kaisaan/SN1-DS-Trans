@@ -1,7 +1,7 @@
 from pathlib import Path
 def extract_text():     # scene: Path, offset: int
     scene = Path(f"decompressed/scn000a.rts")
-    offset = 14384
+    offset = 0x37BB
     scene_data = scene.read_bytes()
     data_size = len(scene_data)
 
@@ -22,10 +22,21 @@ def extract_text():     # scene: Path, offset: int
         match byte:
 
             case 0x2E:
+                code_len = 5
+                arg = int.from_bytes(scene_data[pos + 1 : pos + code_len], byteorder="little")
+                log.write(f"Unk_2E\targ: {arg:X}\n")
+                #log.write("d\n")
                 pos += 5
 
             case 0x31:
-                pos += 9
+                code_len = 9
+                arg = scene_data[pos + 1:pos + code_len]
+                args = scene_data[pos + 1:pos + code_len]
+                arg1 = int.from_bytes(args[0:4], byteorder="little")
+                arg2 = int.from_bytes(args[4:8], byteorder="little")
+                log.write(f"Unk_31\targ: {arg1:X} {arg2:X}\n")
+                #log.write("c\n")
+                pos += code_len
                 
             case 0x34:
                 pos += 13
@@ -102,11 +113,23 @@ def extract_text():     # scene: Path, offset: int
             case 99:
                 pos += 5
                 
-            case 101:
-                pos += 5
+            case 0x65:
+                code_len = 5
+                arg = int.from_bytes(scene_data[pos + 1:pos + code_len], byteorder="little")
+                log.write(f"Unk_65\targ: {arg:X}\n")
+                #log.write("b\n")
+                pos += code_len
                 
-            case 104:
-                pos += 14
+            case 0x68:
+                code_len = 14
+                args = scene_data[pos + 1:pos + code_len]
+                arg1 = int.from_bytes(args[0:4], byteorder="little")
+                arg2 = int.from_bytes(args[4:8], byteorder="little")
+                arg3 = int.from_bytes(args[8:12], byteorder="little")
+                arg4 = int.from_bytes(args[13:14], byteorder="little")
+                log.write(f"Unk_68\targ: {arg1:X} {arg2:X} {arg3:X} {arg4:X}\n")
+                #log.write("a\n")
+                pos += code_len
                 
             case 107:
                 pos += 9
@@ -141,11 +164,12 @@ def extract_text():     # scene: Path, offset: int
                 
             case 0x33:
                 flag = True
+                arg1 = int.from_bytes(scene_data[pos + 1: pos + 5], byteorder="little")
                 str_len = scene_data[pos + 5]
                 string = scene_data[pos + 6: pos + 6 + str_len].decode(encoding="shiftjis", errors="backslashreplace")
                 string = string.replace("\n", "\\n")
                 string_list.append(string)
-                log.write(f"{string}\n")
+                log.write(f"{arg1:X}\t{string}\n")
                 string_indices.append(string_count)
                 pos += 5
                 
@@ -159,3 +183,5 @@ def extract_text():     # scene: Path, offset: int
             pos = pos + 1 + str_len
 
         string_count += 1
+
+#  b b  b  b b  b 

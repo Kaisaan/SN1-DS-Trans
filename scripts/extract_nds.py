@@ -14,8 +14,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.tasks.extract_scenes import extract_scenes
 from libsummon.text import extract_text
 
-
-
 def main():
 
 
